@@ -77,8 +77,8 @@ main() {
     ftp()
     samba()
     echo ""
-    echo "Please enter a Samba password"
-    sudo smbpasswd -a cam
+    echo -e "raspberry\nraspberry\n" | sudo smbpasswd pi -s
+    echo 'cam:raspberry' | sudo chpasswd 
     if (sudo raspi-config nonint get_can_expand) != 0; then
         sudo raspi-config nonint do_expand_rootfs
     fi
