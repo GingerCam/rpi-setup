@@ -84,6 +84,5 @@ main() {
     fi
     echo "Setup complete"
     sleep 5
-    sudo reboot
-    
+    sudo reboot   
 }
