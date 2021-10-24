@@ -70,12 +70,20 @@ main() {
     if (sudo raspi-config nonint get_ssh) != 0; then
         sudo raspi-config nonint do_ssh 0
     fi
+    if (sudo raspi-config nonint get_hostname) != $NEW_HOSTNAME; then
+        sudo raspi-config nonint do_hostname $NEW_HOSTNAME
+    fi
 
     ftp()
     samba()
+    echo ""
     echo "Please enter a Samba password"
     sudo smbpasswd -a cam
+    if (sudo raspi-config nonint get_can_expand) != 0; then
+        sudo raspi-config nonint do_expand_rootfs
+    fi
     echo "Setup complete"
     sleep 5
     sudo reboot
+    
 }
