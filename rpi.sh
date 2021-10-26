@@ -42,14 +42,14 @@ if $1 == "--lite"; then
     lite=True
 fi
 
-ftp() {
+ftp () {
     if grep -q "#write_enable=YES" $ftp_conf; then
         sed -i "s/#write_enable=YES/write_enable=YES"
     fi
     sudo systemctl restart vsftpd
 }
 
-samba(){
+samba (){
     if ! grep -q "Galactica" /etc/samba/smb.conf; then
         echo "[Galactica]" >> /etc/samba/smb.conf
         echo "Comment = Pi shared folder" >> /etc/samba/smb.conf
@@ -65,7 +65,7 @@ samba(){
 
 }
 
-main() {
+main () {
     sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo rpi-update
     for program in $programs; do
         sudo apt install -y $program
@@ -89,16 +89,16 @@ main() {
 
     echo "alias update='sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt autoremove -y && sudo apt autoclean -y && clear'" >> /home/cam/.bashrc
     
-    if (sudo raspi-config nonint get_wifi_country) != "GB"; then
-        sudo raspi-config nonint do_wifi_country GB
-    fi
-    if (sudo raspi-config nonint get_overscan) != 1; then
+     if [[ $(sudo raspi-config nonint get_wifi_country) != "GB" ]]; then
+         sudo raspi-config nonint do_wifi_country GB
+     fi
+    if [[ $(sudo raspi-config nonint get_overscan) != 1 ]]; then
         sudo raspi-config nonint do_overscan 1
     fi
-    if (sudo raspi-config nonint get_ssh) != 0; then
+    if [[ $(sudo raspi-config nonint get_ssh) != 0 ]]; then
         sudo raspi-config nonint do_ssh 0
     fi
-    if (sudo raspi-config nonint get_hostname) != $NEW_HOSTNAME; then
+    if [[ $(sudo raspi-config nonint get_hostname) != $NEW_HOSTNAME ]]; then
         sudo raspi-config nonint do_hostname $NEW_HOSTNAME
     fi
 
@@ -107,7 +107,7 @@ main() {
     echo ""
     echo -e "raspberry\nraspberry\n" | sudo smbpasswd pi -s
     echo 'cam:raspberry' | sudo chpasswd 
-    if (sudo raspi-config nonint get_can_expand) != 0; then
+    if [[ $(sudo raspi-config nonint get_can_expand) != 0 ]]; then
         sudo raspi-config nonint do_expand_rootfs
     fi
     echo "Setup complete"
