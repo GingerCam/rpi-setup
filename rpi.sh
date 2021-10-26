@@ -1,5 +1,20 @@
 #!/bin/bash
 
+if [[ $EUID -ne 0 ]]; then
+    echo "This script required elevated privileges."
+    exit 1
+fi
+
+echo -e "--------------------------------------------------------------------------"
+echo -e "  ██████╗ ██████╗ ██╗    ███████╗███████╗████████╗██╗   ██╗██████╗"
+echo -e "  ██╔══██╗██╔══██╗██║    ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗"
+echo -e "  ██████╔╝██████╔╝██║    ███████╗█████╗     ██║   ██║   ██║██████╔╝"
+echo -e "  ██╔══██╗██╔═══╝ ██║    ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝"
+echo -e "  ██║  ██║██║     ██║    ███████║███████╗   ██║   ╚██████╔╝██║"
+echo -e "  ╚═╝  ╚═╝╚═╝     ╚═╝    ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝"
+echo -e "--------------------------------------------------------------------------"
+
+
 CURRENT_HOSTNAME=$(sudo raspi-config nonint get_hostname)
 NEW_HOSTNAME="Galactica"
 USER="cam"
@@ -19,7 +34,13 @@ programs=(
     "samba"
     "samba-common-bin"
     "vsftpd"
+    "macchanger"
+    "aircrack-ng"
 )
+
+if $1 == "--lite"; then
+    lite=True
+fi
 
 ftp() {
     if grep -q "#write_enable=YES" $ftp_conf; then
@@ -49,9 +70,13 @@ main() {
     for program in $programs; do
         sudo apt install -y $program
     done
+    if lite == False; then
+        sudo apt install raspberrypi-ui-mods
+        sudo systemctl disable lightdm
+    fi
+
     if ! (cat /etc/passwd | grep -q 'cam'); then
         sudo useradd -m -G wheel,dialout,sudo cam
-        export PATH=$PATH:~/.local/bin
         cd /home/cam
         mkdir git
     fi 
@@ -59,6 +84,9 @@ main() {
     chmod +x pishrink.sh
     sudo mv pishrink.sh /usr/local/bin
     rm pishrink.sh
+
+    curl https://download.argon40.com/argon1.sh | bash
+
     echo "alias update='sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt autoremove -y && sudo apt autoclean -y && clear'" >> /home/cam/.bashrc
     
     if (sudo raspi-config nonint get_wifi_country) != "GB"; then
