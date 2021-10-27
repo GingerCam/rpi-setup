@@ -16,7 +16,7 @@ echo -e "-----------------------------------------------------------------------
 
 CURRENT_HOSTNAME=$(sudo raspi-config nonint get_hostname)
 hostname="Galactica"
-USER="cam"
+USER=cam
 lite="false"
 argon="false"
 ftp_conf=/etc/vsftpd.conf
@@ -45,6 +45,7 @@ while [[ "${1}" != "" ]]; do
     	--lite)    lite="true" ;;
         --argon)     argon="true" ;;
         --hostname)     hostname=$2 ;;
+        --user)     USER=$2 ;;
     esac
     
     shift 1
@@ -90,7 +91,7 @@ main() {
     fi
 
     if ! (cat /etc/passwd | grep -q 'cam'); then
-        sudo useradd -m -G wheel,dialout,sudo cam
+        sudo useradd -m -G sudo cam
         cd /home/cam
         mkdir git
     fi
@@ -114,21 +115,22 @@ main() {
     if [[ $(sudo raspi-config nonint get_ssh) != 0 ]]; then
         sudo raspi-config nonint do_ssh 0
     fi
-    if [[ $(sudo raspi-config nonint get_hostname) != $hostname ]]; then
-        sudo raspi-config nonint do_hostname $NEW_HOSTNAME
-    fi
- 
+
+    ftp 
+    samba
+
     echo ""
     echo -e "raspberry\nraspberry\n" | sudo smbpasswd pi -s
     echo 'cam:raspberry' | sudo chpasswd
     if [[ $(sudo raspi-config nonint get_can_expand) != 0 ]]; then
         sudo raspi-config nonint do_expand_rootfs
     fi
+    if [[ $(sudo raspi-config nonint get_hostname) != $hostname ]]; then
+        sudo raspi-config nonint do_hostname $hostname
+    fi
     echo "Setup complete"
     sleep 5
     sudo reboot
 }
 
-main()
-ftp() 
-samba()
+main
