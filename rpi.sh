@@ -117,9 +117,7 @@ main() {
     if [[ $(sudo raspi-config nonint get_hostname) != $hostname ]]; then
         sudo raspi-config nonint do_hostname $NEW_HOSTNAME
     fi
-
-    ftp() 
-    samba() 
+ 
     echo ""
     echo -e "raspberry\nraspberry\n" | sudo smbpasswd pi -s
     echo 'cam:raspberry' | sudo chpasswd
@@ -130,3 +128,7 @@ main() {
     sleep 5
     sudo reboot
 }
+
+main()
+ftp() 
+samba()
