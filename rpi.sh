@@ -105,7 +105,7 @@ main() {
     echo "[/] Installed Packages"
     sleep 4
     echo "[*] Setting up user"
-    sleep 1
+        sleep 1
     if ! (cat /etc/passwd | grep -q '$USER'); then
         sudo useradd -m -G sudo $USER
         cd /home/$USER
@@ -118,7 +118,7 @@ main() {
     if [ $argon = "true" ]; then
         curl https://download.argon40.com/argon1.sh | bash
     fi
-    if ! [[ grep -q "update=" /home/$USER/.bashrc ]];
+    if ! grep -q "update=" /home/$USER/.bashrc; then
         echo "alias update='sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt autoremove -y && sudo apt autoclean -y && clear'" >>/home/cam/.bashrc
     fi
     if [[ $(sudo raspi-config nonint get_wifi_country) != "GB" ]]; then
