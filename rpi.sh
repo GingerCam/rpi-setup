@@ -5,15 +5,16 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 clear
-
-echo -e "--------------------------------------------------------------------------"
-echo -e "  ██████╗ ██████╗ ██╗    ███████╗███████╗████████╗██╗   ██╗██████╗"
-echo -e "  ██╔══██╗██╔══██╗██║    ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗"
-echo -e "  ██████╔╝██████╔╝██║    ███████╗█████╗     ██║   ██║   ██║██████╔╝"
-echo -e "  ██╔══██╗██╔═══╝ ██║    ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝"
-echo -e "  ██║  ██║██║     ██║    ███████║███████╗   ██║   ╚██████╔╝██║"
-echo -e "  ╚═╝  ╚═╝╚═╝     ╚═╝    ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝"
-echo -e "--------------------------------------------------------------------------"
+banner() {
+    echo -e "--------------------------------------------------------------------------"
+    echo -e "  ██████╗ ██████╗ ██╗    ███████╗███████╗████████╗██╗   ██╗██████╗"
+    echo -e "  ██╔══██╗██╔══██╗██║    ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗"
+    echo -e "  ██████╔╝██████╔╝██║    ███████╗█████╗     ██║   ██║   ██║██████╔╝"
+    echo -e "  ██╔══██╗██╔═══╝ ██║    ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝"
+    echo -e "  ██║  ██║██║     ██║    ███████║███████╗   ██║   ╚██████╔╝██║"
+    echo -e "  ╚═╝  ╚═╝╚═╝     ╚═╝    ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝"
+    echo -e "--------------------------------------------------------------------------"
+}
 
 CURRENT_HOSTNAME=$(sudo raspi-config nonint get_hostname)
 hostname="Galactica"
@@ -53,9 +54,7 @@ while [[ "${1}" != "" ]]; do
     shift 1
 done
 
-echo "Lite mode = $lite"
-echo "Argon one = $argon"
-echo "Hostname = $hostname"
+
 sleep 4
 
 ftp() {
@@ -90,11 +89,17 @@ samba() {
 }
 
 main() {
+    banner
+    echo "Lite mode = $lite"
+    echo "Argon one = $argon"
+    echo "Hostname = $hostname"
+    echo "---------------------"
+    echo ""
     echo "[*] Installing Packages"
     sleep 1
     sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y 
     for program in "${programs[@]}"; do
-        sudo apt install -y "$program"
+        DEBIAN_FRONTEND=noninteractive sudo apt install -yq "$program"
     done
 
     if lite = "false"; then
@@ -135,7 +140,7 @@ main() {
     samba
 
     echo ""
-    echo -e "raspberry\nraspberry\n" | sudo smbpasswd pi -s
+    echo -e "raspberry\nraspberry\n" | sudo smbpasswd -a $USER -s
     echo 'cam:raspberry' | sudo chpasswd
     if [[ $(sudo raspi-config nonint get_can_expand) != 0 ]]; then
         sudo raspi-config nonint do_expand_rootfs
@@ -144,6 +149,7 @@ main() {
         sudo raspi-config nonint do_hostname $hostname
     fi
     echo "Setup complete"
+    echo "Your system will now reboot"
     sleep 5
     sudo reboot
 }
