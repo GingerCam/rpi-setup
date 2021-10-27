@@ -81,9 +81,9 @@ samba() {
 }
 
 main() {
-    sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo rpi-update
-    for program in $programs; do
-        sudo apt install -y $program
+    sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y 
+    for program in "${programs[@]}"; do
+        sudo apt install -y "$program"
     done
     if lite = "false"; then
         sudo apt install raspberrypi-ui-mods
